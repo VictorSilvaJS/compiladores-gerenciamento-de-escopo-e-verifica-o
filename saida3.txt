@@ -1,0 +1,11 @@
+12345
+25
+"Compiladores"
+25
+Erro linha 18, tipos não compatíveis.
+25
+""
+"Hello"
+Erro linha 25, tipos não compatíveis.
+"Hello"
+45

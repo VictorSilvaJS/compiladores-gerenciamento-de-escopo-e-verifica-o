@@ -1,0 +1,119 @@
+IMPORTAR sys
+IMPORTAR re
+
+Classe Escopo:
+    variaveis = dicionário vazio
+
+    Função adicionar_variavel(lexema, tipo, valor):
+        Se lexema está em variaveis:
+            Retornar "Erro: Variável já declarada no escopo atual"
+        Adicionar lexema e seu tipo e valor ao dicionário variaveis
+
+    Função obter_variavel(lexema):
+        Retornar variavel de variaveis se encontrada, caso contrário None
+
+Classe GerenciadorEscopos:
+    pilha_escopos = lista contendo um novo Escopo
+
+    Função entrar_escopo():
+        Adicionar um novo Escopo à pilha_escopos
+
+    Função sair_escopo():
+        Se pilha_escopos contém mais de um Escopo:
+            Remover o Escopo no topo da pilha
+        Caso contrário:
+            Imprimir "Erro: Tentativa de finalizar escopo inexistente"
+
+    Função adicionar_variavel(lexema, tipo, valor, linha):
+        Adicionar variável ao Escopo no topo da pilha
+        Se erro for retornado:
+            Imprimir "Erro na linha {linha}: {erro}"
+
+    Função encontrar_variavel(lexema):
+        Para cada escopo em pilha_escopos (do topo até a base):
+            Se variavel existe no escopo:
+                Retornar a variavel
+        Retornar None
+Função analisar_programa(conteudo_programa):
+    Inicializar gerenciador de escopos
+    Dividir conteudo_programa em linhas
+
+    Para cada linha em linhas:
+        Remover comentários da linha
+        Se linha estiver vazia:
+            Continuar para a próxima linha
+
+        Pré-processar linha para adicionar espaços ao redor de operadores
+        Dividir linha em tokens
+
+        Se tokens estiverem vazios:
+            Continuar para a próxima linha
+
+        comando = tokens[0]
+
+        Se comando for 'BLOCO':
+            gerenciador.entrar_escopo()
+        
+        Elif comando for 'FIM':
+            gerenciador.sair_escopo()
+        
+        Elif comando for 'NUMERO' ou 'CADEIA':
+            tipo = comando
+            Dividir tokens restantes em declarações de variáveis
+            Para cada declaracao em declaracoes:
+                Dividir declaracao em partes nome e valor
+                lexema_var = partes[0].trim()
+                valor = "" se tipo for 'CADEIA' senão 0
+
+                Se valor for especificado:
+                    Remover aspas do valor se presente
+                    Tentar converter valor para float ou int se tipo for 'NUMERO'
+                    Se erro na conversão:
+                        Imprimir "Erro na linha {linha}: Valor inválido"
+                        Continuar para a próxima declaração
+
+                Adicionar variável ao escopo atual
+
+        Elif comando for 'PRINT':
+            Procurar variável no escopo
+            Se variável encontrada:
+                Imprimir valor da variável, com aspas se for CADEIA
+            Caso contrário:
+                Imprimir "Erro na linha {linha}: Variável não declarada"
+
+        Elif tokens tem mais de 2 elementos e segundo token é '=':
+            lexema_var = tokens[0].trim()
+            valor = combinar tokens a partir do terceiro
+
+            Procurar variável de destino no escopo
+            Se valor começa e termina com aspas:
+                Remover aspas do valor
+            Elif valor é numérico:
+                Converter valor para float ou int
+            Caso contrário:
+                Procurar variável de origem no escopo
+                Se variável de origem encontrada:
+                    valor = valor da variável de origem
+                Caso contrário:
+                    Imprimir "Erro na linha {linha}: Variável não declarada"
+                    Continuar para a próxima linha
+
+            Se variável de destino encontrada:
+                Se tipos são compatíveis:
+                    Atribuir valor à variável de destino
+                Caso contrário:
+                    Imprimir "Erro na linha {linha}: Tipos não compatíveis"
+            Caso contrário:
+                Imprimir "Erro na linha {linha}: Variável não declarada"
+
+Função principal:
+    
+    Imprimir "Digite o comando python main.py (nome do arquivo.txt)"
+        nome_arquivo = segundo argumento dos argumentos de linha de comando
+
+    Tentar abrir o arquivo com nome_arquivo:
+        Se sucesso:
+            ler conteudo do arquivo e armazenar em conteudo_programa
+            chamar a função analisar_programa com conteudo_programa como argumento
+        Se falha (arquivo não encontrado):
+            Imprimir "Erro: nome invalido ou arquivo '{nome_arquivo}' não localizado."
